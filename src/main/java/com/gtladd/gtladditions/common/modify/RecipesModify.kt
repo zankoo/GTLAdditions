@@ -15,6 +15,7 @@ import com.gregtechceu.gtceu.common.data.GTMaterials.Helium
 import com.gregtechceu.gtceu.common.data.GTRecipeTypes.LASER_ENGRAVER_RECIPES
 import com.gregtechceu.gtceu.common.data.GTRecipeTypes.VACUUM_RECIPES
 import com.gregtechceu.gtceu.data.recipe.builder.GTRecipeBuilder
+import com.gtladd.gtladditions.GTLAdditions.Companion.id
 import com.gtladd.gtladditions.common.recipe.GTLAddRecipesTypes.ANTIENTROPY_CONDENSATION
 import com.gtladd.gtladditions.common.recipe.GTLAddRecipesTypes.CHAOTIC_ALCHEMY
 import com.gtladd.gtladditions.common.recipe.GTLAddRecipesTypes.LEYLINE_CRYSTALLIZE
@@ -22,6 +23,7 @@ import com.gtladd.gtladditions.common.recipe.GTLAddRecipesTypes.PHOTON_MATRIX_ET
 import com.gtladd.gtladditions.common.recipe.GTLAddRecipesTypes.SPACE_ORE_PROCESSOR
 import com.gtladd.gtladditions.utils.TempChemicalHelper
 import net.minecraft.data.recipes.FinishedRecipe
+import net.minecraft.resources.ResourceLocation
 import org.gtlcore.gtlcore.common.data.GTLMaterials.EuvPhotoresist
 import org.gtlcore.gtlcore.common.data.GTLMaterials.Photoresist
 import org.gtlcore.gtlcore.common.data.GTLRecipeTypes.*
@@ -136,10 +138,12 @@ object RecipesModify {
                 .copyFrom(recipeBuilder)
                 .EUt(recipeBuilder.EUt() * 4)
 
-            val itemOutputs = leylineBuilder.output[ItemRecipeCapability.CAP] ?: return@onRecipeBuild
-            val content = itemOutputs.firstOrNull() ?: return@onRecipeBuild
-            itemOutputs.clear()
-            itemOutputs.add(content.copy(ItemRecipeCapability.CAP, ContentModifier.multiplier(1.5)))
+            if (!recipeBuilder.id.equals(id("reaction_chamber"))) {
+                val itemOutputs = leylineBuilder.output[ItemRecipeCapability.CAP] ?: return@onRecipeBuild
+                val content = itemOutputs.firstOrNull() ?: return@onRecipeBuild
+                itemOutputs.clear()
+                itemOutputs.add(content.copy(ItemRecipeCapability.CAP, ContentModifier.multiplier(1.5)))
+            }
 
             leylineBuilder.save(provider)
         }
