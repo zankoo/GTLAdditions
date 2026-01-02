@@ -9,7 +9,7 @@ import com.gtladd.gtladditions.api.machine.logic.GTLAddMultipleRecipesLogic
 import com.gtladd.gtladditions.api.machine.multiblock.GTLAddWorkableElectricMultipleRecipesMachine
 import com.gtladd.gtladditions.common.data.ParallelData
 import com.gtladd.gtladditions.common.machine.muiltblock.controller.SubspaceCorridorHubIndustrialArray
-import com.gtladd.gtladditions.utils.CommonUtils.createRainbowComponent
+import com.gtladd.gtladditions.utils.CommonUtils.createLanguageRainbowComponentOnServer
 import com.gtladd.gtladditions.utils.IndustrialArrayPosHelper
 import com.gtladd.gtladditions.utils.RecipeCalculationHelper
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted
@@ -53,16 +53,16 @@ class SubspaceCorridorHubIndustrialArrayModuleBase(holder: IMachineBlockEntity) 
             textList.add(
                 Component.translatable(
                     "gtceu.multiblock.parallel",
-                    createRainbowComponent(
-                        Component.translatable("gtladditions.multiblock.forge_of_the_antichrist.parallel").string
+                    createLanguageRainbowComponentOnServer(
+                        Component.translatable("gtladditions.multiblock.forge_of_the_antichrist.parallel")
                     )
                 ).withStyle(ChatFormatting.GRAY)
             )
             textList.add(
                 Component.translatable(
                     "gtladditions.multiblock.threads",
-                    createRainbowComponent(
-                        Component.translatable("gtladditions.multiblock.forge_of_the_antichrist.parallel").string
+                    createLanguageRainbowComponentOnServer(
+                        Component.translatable("gtladditions.multiblock.forge_of_the_antichrist.parallel")
                     )
                 ).withStyle(ChatFormatting.GRAY)
             )

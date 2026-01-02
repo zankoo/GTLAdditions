@@ -17,7 +17,7 @@ import com.gregtechceu.gtceu.api.machine.feature.multiblock.IDistinctPart
 import com.gregtechceu.gtceu.api.machine.multiblock.part.TieredIOPartMachine
 import com.gtladd.gtladditions.common.machine.trait.FastNotifiableInputFluidTank
 import com.gtladd.gtladditions.common.machine.trait.FastNotifiableInputItemStack
-import com.gtladd.gtladditions.utils.CommonUtils.createRainbowComponent
+import com.gtladd.gtladditions.utils.CommonUtils.createLanguageRainbowComponentOnServer
 import com.gtladd.gtladditions.utils.TransferHelper
 import com.hepdd.gtmthings.api.machine.fancyconfigurator.ButtonConfigurator
 import com.hepdd.gtmthings.api.machine.fancyconfigurator.InventoryFancyConfigurator
@@ -210,8 +210,8 @@ class InfinityDualHatchPartMachine(holder: IMachineBlockEntity) :
         textList.add(
             0,
             Component.translatable(
-                "gtmthings.machine.huge_item_bus.tooltip.2", inventory.realSize, createRainbowComponent(
-                    Component.translatable("gtladditions.multiblock.forge_of_the_antichrist.parallel").string
+                "gtmthings.machine.huge_item_bus.tooltip.2", inventory.realSize, createLanguageRainbowComponentOnServer(
+                    Component.translatable("gtladditions.multiblock.forge_of_the_antichrist.parallel")
                 )
             )
                 .setStyle(
@@ -220,8 +220,8 @@ class InfinityDualHatchPartMachine(holder: IMachineBlockEntity) :
         )
         textList.add(
             1, Component.translatable(
-                "gtmthings.machine.huge_dual_hatch.tooltip.2", tank.realSize, createRainbowComponent(
-                    Component.translatable("gtladditions.multiblock.forge_of_the_antichrist.parallel").string
+                "gtmthings.machine.huge_dual_hatch.tooltip.2", tank.realSize, createLanguageRainbowComponentOnServer(
+                    Component.translatable("gtladditions.multiblock.forge_of_the_antichrist.parallel")
                 )
             ).setStyle(
                 Style.EMPTY.withColor(ChatFormatting.GREEN)

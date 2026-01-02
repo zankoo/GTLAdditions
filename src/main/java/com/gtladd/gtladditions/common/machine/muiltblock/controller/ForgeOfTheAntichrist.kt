@@ -18,6 +18,7 @@ import com.gtladd.gtladditions.common.data.ParallelData
 import com.gtladd.gtladditions.common.machine.muiltblock.MultiBlockMachine
 import com.gtladd.gtladditions.common.machine.trait.StarRitualTrait
 import com.gtladd.gtladditions.common.recipe.GTLAddRecipesTypes
+import com.gtladd.gtladditions.utils.CommonUtils.createLanguageRainbowComponentOnServer
 import com.gtladd.gtladditions.utils.CommonUtils.createObfuscatedRainbowComponent
 import com.gtladd.gtladditions.utils.CommonUtils.createRainbowComponent
 import com.gtladd.gtladditions.utils.RecipeCalculationHelper
@@ -93,8 +94,8 @@ class ForgeOfTheAntichrist(holder: IMachineBlockEntity, vararg args: Any?) :
 
         textList.add(
             if (runningSecs >= MAX_EFFICIENCY_SEC) {
-                createRainbowComponent(
-                    Component.translatable("gtladditions.multiblock.forge_of_the_antichrist.achieve_max_efficiency").string
+                createLanguageRainbowComponentOnServer(
+                    Component.translatable("gtladditions.multiblock.forge_of_the_antichrist.achieve_max_efficiency")
                 )
             } else {
                 Component.translatable(
@@ -117,16 +118,16 @@ class ForgeOfTheAntichrist(holder: IMachineBlockEntity, vararg args: Any?) :
         textList.add(
             Component.translatable(
                 "gtceu.multiblock.parallel",
-                createRainbowComponent(
-                    Component.translatable("gtladditions.multiblock.forge_of_the_antichrist.parallel").string
+                createLanguageRainbowComponentOnServer(
+                    Component.translatable("gtladditions.multiblock.forge_of_the_antichrist.parallel")
                 )
             ).withStyle(ChatFormatting.GRAY)
         )
         textList.add(
             Component.translatable(
                 "gtladditions.multiblock.threads",
-                createRainbowComponent(
-                    Component.translatable("gtladditions.multiblock.forge_of_the_antichrist.parallel").string
+                createLanguageRainbowComponentOnServer(
+                    Component.translatable("gtladditions.multiblock.forge_of_the_antichrist.parallel")
                 )
             ).withStyle(ChatFormatting.GRAY)
         )

@@ -3,19 +3,21 @@ package com.gtladd.gtladditions.common.modify
 import com.gregtechceu.gtceu.api.GTValues
 import com.gregtechceu.gtceu.api.GTValues.VA
 import com.gregtechceu.gtceu.api.capability.recipe.FluidRecipeCapability
+import com.gregtechceu.gtceu.api.capability.recipe.ItemRecipeCapability
 import com.gregtechceu.gtceu.api.fluids.store.FluidStorageKey
 import com.gregtechceu.gtceu.api.fluids.store.FluidStorageKeys.GAS
 import com.gregtechceu.gtceu.api.fluids.store.FluidStorageKeys.LIQUID
 import com.gregtechceu.gtceu.api.recipe.content.Content
+import com.gregtechceu.gtceu.api.recipe.content.ContentModifier
 import com.gregtechceu.gtceu.api.recipe.ingredient.FluidIngredient
 import com.gregtechceu.gtceu.common.data.GCyMRecipeTypes.ALLOY_BLAST_RECIPES
-import com.gregtechceu.gtceu.common.data.GTMaterials
 import com.gregtechceu.gtceu.common.data.GTMaterials.Helium
 import com.gregtechceu.gtceu.common.data.GTRecipeTypes.LASER_ENGRAVER_RECIPES
 import com.gregtechceu.gtceu.common.data.GTRecipeTypes.VACUUM_RECIPES
 import com.gregtechceu.gtceu.data.recipe.builder.GTRecipeBuilder
 import com.gtladd.gtladditions.common.recipe.GTLAddRecipesTypes.ANTIENTROPY_CONDENSATION
 import com.gtladd.gtladditions.common.recipe.GTLAddRecipesTypes.CHAOTIC_ALCHEMY
+import com.gtladd.gtladditions.common.recipe.GTLAddRecipesTypes.LEYLINE_CRYSTALLIZE
 import com.gtladd.gtladditions.common.recipe.GTLAddRecipesTypes.PHOTON_MATRIX_ETCH
 import com.gtladd.gtladditions.common.recipe.GTLAddRecipesTypes.SPACE_ORE_PROCESSOR
 import com.gtladd.gtladditions.utils.TempChemicalHelper
@@ -37,6 +39,7 @@ object RecipesModify {
         initAntientropyCondensation()
         initChaoticAlchemy()
         initSpaceOreProcessor()
+        initLeylineCrystallize()
         if (ConfigHolder.INSTANCE.enableSkyBlokeMode) SkyTearsAndGregHeart.init()
     }
 
@@ -124,6 +127,21 @@ object RecipesModify {
                 .EUt(VA[GTValues.HV].toLong())
             spaceBuilder.input[FluidRecipeCapability.CAP]?.clear()
             spaceBuilder.save(provider)
+        }
+    }
+
+    private fun initLeylineCrystallize() {
+        AGGREGATION_DEVICE_RECIPES.onRecipeBuild { recipeBuilder: GTRecipeBuilder, provider: Consumer<FinishedRecipe> ->
+            val leylineBuilder = LEYLINE_CRYSTALLIZE
+                .copyFrom(recipeBuilder)
+                .EUt(recipeBuilder.EUt() * 4)
+
+            val itemOutputs = leylineBuilder.output[ItemRecipeCapability.CAP] ?: return@onRecipeBuild
+            val content = itemOutputs.firstOrNull() ?: return@onRecipeBuild
+            itemOutputs.clear()
+            itemOutputs.add(content.copy(ItemRecipeCapability.CAP, ContentModifier.multiplier(1.5)))
+
+            leylineBuilder.save(provider)
         }
     }
 }

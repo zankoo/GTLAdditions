@@ -25,10 +25,7 @@ import org.gtlcore.gtlcore.utils.TextUtil
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.text.DecimalFormat
-import kotlin.math.log10
-import kotlin.math.max
-import kotlin.math.min
-import kotlin.math.pow
+import kotlin.math.*
 
 object CommonUtils {
 
@@ -129,17 +126,41 @@ object CommonUtils {
     }
 
     fun createObfuscatedRainbowComponent(text: String): Component {
-        val component = Component.empty()
-
-        text.forEachIndexed { index, char ->
-            component.append(
-                Component.literal(char.toString())
-                    .withStyle(ChatFormatting.OBFUSCATED)
-                    .withStyle { style: Style? -> style!!.withColor(TooltipHelper.RAINBOW.current)}
+        return formattingComponent(
+            Component.literal(text),
+            arrayOf(
+                ChatFormatting.RED,
+                ChatFormatting.GOLD,
+                ChatFormatting.YELLOW,
+                ChatFormatting.GREEN,
+                ChatFormatting.AQUA,
+                ChatFormatting.BLUE,
+                ChatFormatting.LIGHT_PURPLE
             )
-        }
+        ).withStyle(ChatFormatting.OBFUSCATED)
+    }
 
-        return component
+    private fun formattingComponent(component: MutableComponent, colours: Array<ChatFormatting>): MutableComponent {
+        val delay = 200.0
+        val offset = floor((System.currentTimeMillis() and 0x3FFFL) / delay).toInt() % colours.size
+        val color = colours[offset]
+
+        return component.withStyle(color)
+    }
+
+    fun createLanguageRainbowComponentOnServer(component: MutableComponent): Component {
+        return formattingComponent(
+            component,
+            arrayOf(
+                ChatFormatting.RED,
+                ChatFormatting.GOLD,
+                ChatFormatting.YELLOW,
+                ChatFormatting.GREEN,
+                ChatFormatting.AQUA,
+                ChatFormatting.BLUE,
+                ChatFormatting.LIGHT_PURPLE
+            )
+        )
     }
 
     fun createObfuscatedDeleteComponent(text: String): Component {

@@ -118,7 +118,7 @@ object RecipeCalculationHelper {
             )
 
             if (parallelData.shouldProcess) {
-                if (tempAccumulatedEu > maxTotalEu) {
+                if (isEnergyConsumer && tempAccumulatedEu > maxTotalEu) {
                     if (accumulatedEu.signum() == 0) RecipeResult.of(machine, RecipeResult.FAIL_NO_ENOUGH_EU_IN)
                     break
                 }

@@ -22,7 +22,7 @@ public abstract class GTRecipeBuilderMixin {
 
     @Inject(method = "toJson", at = @At("TAIL"), remap = false)
     public void toJson(JsonObject json, CallbackInfo ci) {
-        if (recipeType == GTLAddRecipesTypes.GENESIS_ENGINE) {
+        if (recipeType == GTLAddRecipesTypes.GENESIS_ENGINE || recipeType == GTLAddRecipesTypes.INTER_STELLAR || recipeType == GTLAddRecipesTypes.CHAOS_WEAVE) {
             json.remove("duration");
             json.addProperty("duration", duration);
         }

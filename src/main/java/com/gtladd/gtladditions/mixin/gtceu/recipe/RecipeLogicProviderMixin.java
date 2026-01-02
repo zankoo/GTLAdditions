@@ -113,11 +113,15 @@ public abstract class RecipeLogicProviderMixin {
             }
             String reason = capData.getString("work_reason");
             if (reason.isEmpty()) return;
-            tooltip.add(Component.translatable("gtceu.recipe.fail.reason", reason).withStyle(RED));
+            Component reasonComponent = Component.Serializer.fromJson(reason);
+            if (reasonComponent == null) return;
+            tooltip.add(Component.translatable("gtceu.recipe.fail.reason", reasonComponent).withStyle(RED));
         } else {
             String reason = capData.getString("reason");
             if (reason.isEmpty()) return;
-            tooltip.add(Component.translatable("gtceu.recipe.fail.reason", reason).withStyle(RED));
+            Component reasonComponent = Component.Serializer.fromJson(reason);
+            if (reasonComponent == null) return;
+            tooltip.add(Component.translatable("gtceu.recipe.fail.reason", reasonComponent).withStyle(RED));
         }
     }
 }

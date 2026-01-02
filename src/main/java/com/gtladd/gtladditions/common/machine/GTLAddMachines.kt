@@ -156,6 +156,7 @@ object GTLAddMachines {
                 Component.translatable("gtladditions.multiblock.forge_of_the_antichrist.parallel")
                     .withStyle(ChatFormatting.GOLD).withStyle(ChatFormatting.BOLD),
                 FormattingUtil.formatNumbers(Long.Companion.MAX_VALUE)))
+            .tooltips(Component.translatable("gtladditions.machine.infinity_input_dual_hatch.tooltip.0"))
             .tooltipBuilder(GTLAdd_ADD).tier(14).register()
         ME_SUPER_PATTERN_BUFFER = REGISTRATE.machine("me_super_pattern_buffer")
         { MESuperPatternBufferPartMachine(it!!, ConfigHolder.INSTANCE.superPatternBuffer.patternsPerRow, ConfigHolder.INSTANCE.superPatternBuffer.rowsPerPage, ConfigHolder.INSTANCE.superPatternBuffer.maxPages) }

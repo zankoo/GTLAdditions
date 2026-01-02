@@ -7,18 +7,13 @@ import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity
 import com.gregtechceu.gtceu.api.machine.trait.RecipeLogic
 import com.gregtechceu.gtceu.api.recipe.GTRecipe
 import com.gregtechceu.gtceu.api.recipe.RecipeHelper
-import com.gregtechceu.gtceu.api.recipe.content.Content
 import com.gtladd.gtladditions.api.machine.logic.GTLAddMultipleRecipesLogic
 import com.gtladd.gtladditions.api.machine.multiblock.GTLAddWorkableElectricMultipleRecipesMachine
-import com.gtladd.gtladditions.api.recipe.WirelessGTRecipe
-import com.gtladd.gtladditions.utils.RecipeCalculationHelper
-import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.HoverEvent
 import org.gtlcore.gtlcore.api.recipe.RecipeRunnerHelper
 import org.gtlcore.gtlcore.integration.gtmt.NewGTValues
-import java.math.BigInteger
 
 class HeartOfTheUniverse(holder: IMachineBlockEntity, vararg args: Any?) :
     GTLAddWorkableElectricMultipleRecipesMachine(holder, *args) {
