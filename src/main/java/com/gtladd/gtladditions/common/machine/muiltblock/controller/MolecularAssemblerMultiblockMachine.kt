@@ -123,8 +123,8 @@ class MolecularAssemblerMultiblockMachine(holder: IMachineBlockEntity) :
                 textList.add(
                     Component.translatable(
                         "gtceu.multiblock.parallel",
-                        CommonUtils.createRainbowComponent(
-                            Component.translatable("gtladditions.multiblock.forge_of_the_antichrist.parallel").string
+                        CommonUtils.createLanguageRainbowComponentOnServer(
+                            Component.translatable("gtladditions.multiblock.forge_of_the_antichrist.parallel")
                         )
                     ).withStyle(ChatFormatting.GRAY)
                 )

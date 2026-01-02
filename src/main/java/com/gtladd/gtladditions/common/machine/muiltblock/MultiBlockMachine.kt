@@ -65,6 +65,7 @@ import com.gtladd.gtladditions.common.recipe.GTLAddRecipesTypes.CHAOTIC_ALCHEMY
 import com.gtladd.gtladditions.common.recipe.GTLAddRecipesTypes.EM_RESONANCE_CONVERSION_FIELD
 import com.gtladd.gtladditions.common.recipe.GTLAddRecipesTypes.GENESIS_ENGINE
 import com.gtladd.gtladditions.common.recipe.GTLAddRecipesTypes.INTER_STELLAR
+import com.gtladd.gtladditions.common.recipe.GTLAddRecipesTypes.LEYLINE_CRYSTALLIZE
 import com.gtladd.gtladditions.common.recipe.GTLAddRecipesTypes.MATTER_EXOTIC
 import com.gtladd.gtladditions.common.recipe.GTLAddRecipesTypes.MOLECULAR_DECONSTRUCTION
 import com.gtladd.gtladditions.common.recipe.GTLAddRecipesTypes.NIGHTMARE_CRAFTING
@@ -129,6 +130,7 @@ object MultiBlockMachine {
     val HELIOFLARE_POWER_FORGE: MultiblockMachineDefinition
     val HELIOFLUIX_MELTING_CORE: MultiblockMachineDefinition
     val HELIOTHERMAL_PLASMA_FABRICATOR: MultiblockMachineDefinition
+    val HELIOPHASE_LEYLINE_CRYSTALLIZER: MultiblockMachineDefinition
     val HEART_OF_THE_UNIVERSE: MultiblockMachineDefinition
     val LIGHT_HUNTER_SPACE_STATION: MultiblockMachineDefinition
     val DIMENSION_FOCUS_INFINITY_CRAFTING_ARRAY: MultiblockMachineDefinition
@@ -931,17 +933,27 @@ object MultiBlockMachine {
             Function { TaixuTurbidArray(it) })
             .tooltipTextKey(Component.translatable("gtceu.machine.taixuturbidarray.tooltip.0"))
             .tooltipTextKey(Component.translatable("gtceu.machine.taixuturbidarray.tooltip.1"))
+            .tooltipTextKey(Component.translatable("gtladditions.multiblock.forge_of_the_antichrist.tooltip.3"))
             .tooltipTextKey(Component.translatable("gtceu.machine.taixuturbidarray.tooltip.12"))
             .tooltipTextKey(Component.translatable("gtceu.machine.taixuturbidarray.tooltip.2"))
             .tooltipTextKey(Component.translatable("gtceu.machine.taixuturbidarray.tooltip.3"))
             .tooltipTextKey(Component.translatable("gtceu.machine.taixuturbidarray.tooltip.13"))
             .tooltipTextKey(Component.translatable("gtceu.machine.taixuturbidarray.tooltip.4"))
             .tooltipTextKey(Component.translatable("gtceu.machine.taixuturbidarray.tooltip.5"))
+            .tooltipTextKey(Component.translatable("gtladditions.multiblock.forge_of_the_antichrist.tooltip.3"))
             .tooltipTextKey(Component.translatable("gtceu.machine.taixuturbidarray.tooltip.6"))
             .tooltipTextKey(Component.translatable("gtceu.machine.taixuturbidarray.tooltip.8"))
             .tooltipTextKey(Component.translatable("gtceu.machine.taixuturbidarray.tooltip.9"))
-            .tooltipTextKey(Component.translatable("gtceu.machine.taixuturbidarray.tooltip.14"))
+            .tooltipTextKey(Component.translatable("gtceu.machine.taixuturbidarray.tooltip.14", 5))
+            .tooltipTextKey(Component.translatable("gtceu.machine.taixuturbidarray.tooltip.15"))
             .tooltipTextKey(Component.translatable("gtceu.machine.taixuturbidarray.tooltip.7"))
+            .tooltipTextKey(Component.translatable("gtladditions.multiblock.forge_of_the_antichrist.tooltip.3"))
+            .tooltipTextKey(Component.translatable("gtceu.machine.taixuturbidarray.tooltip.16"))
+            .tooltipTextKey(Component.translatable("gtceu.machine.taixuturbidarray.tooltip.17"))
+            .tooltipTextKey(Component.translatable("gtceu.machine.taixuturbidarray.tooltip.18"))
+            .tooltipTextKey(Component.translatable("gtceu.machine.eut_multiplier.tooltip", 16))
+            .tooltipTextKey(Component.translatable("gtceu.machine.taixuturbidarray.tooltip.14", 1))
+            .tooltipTextKey(Component.translatable("gtladditions.multiblock.forge_of_the_antichrist.tooltip.3"))
             .tooltipTextKey(Component.translatable("gtceu.machine.taixuturbidarray.tooltip.11"))
             .tooltipTextKey(Component.translatable("gtceu.machine.taixuturbidarray.tooltip.10"))
             .tooltipBuilder(GTLAddMachines.GTLAdd_ADD)
@@ -1215,7 +1227,8 @@ object MultiBlockMachine {
                         .or(Predicates.blocks(HELIOFUSION_EXOTICIZER.get()))
                         .or(Predicates.blocks(HELIOFLARE_POWER_FORGE.get()))
                         .or(Predicates.blocks(HELIOFLUIX_MELTING_CORE.get()))
-                        .or(Predicates.blocks(HELIOTHERMAL_PLASMA_FABRICATOR.get())))
+                        .or(Predicates.blocks(HELIOTHERMAL_PLASMA_FABRICATOR.get()))
+                        .or(Predicates.blocks(HELIOPHASE_LEYLINE_CRYSTALLIZER.get())))
                     .where("K", Predicates.blocks(MEDIARY_GRAVITON_FLOW_REGULATOR.get()))
                     .build()
             }
@@ -1366,6 +1379,39 @@ object MultiBlockMachine {
             .tooltipTextRecipeTypes(STELLAR_LGNITION, FUSION_RECIPES, SUPER_PARTICLE_COLLIDER_RECIPES)
             .tooltipBuilder(GTLAddMachines.GTLAdd_ADD)
             .recipeTypes(STELLAR_LGNITION, FUSION_RECIPES, SUPER_PARTICLE_COLLIDER_RECIPES)
+            .appearanceBlock(GOD_FORGE_TRIM_CASING)
+            .pattern { definition ->
+                MultiBlockStructureD.FORGE_OF_THE_ANTICHRIST_MODULE!!
+                    .where("~", Predicates.controller(Predicates.blocks(definition.get())))
+                    .where("B", Predicates.blocks(GOD_FORGE_TRIM_CASING.get())
+                        .or(Predicates.abilities(PartAbility.IMPORT_ITEMS))
+                        .or(Predicates.abilities(PartAbility.IMPORT_FLUIDS))
+                        .or(Predicates.abilities(PartAbility.EXPORT_ITEMS))
+                        .or(Predicates.abilities(PartAbility.EXPORT_FLUIDS)))
+                    .where("F", Predicates.blocks(PHONON_CONDUIT.get()))
+                    .where("G", Predicates.blocks(GOD_FORGE_ENERGY_CASING.get()))
+                    .where("D", Predicates.blocks(SUPRACHRONAL_MAGNETIC_CONFINEMENT_CASING.get()))
+                    .where("E", Predicates.blocks(GOD_FORGE_SUPPORT_CASING.get()))
+                    .build()
+            }
+            .workableCasingRenderer(GTLAdditions.id("block/casings/god_forge_trim_casing"), GTLAdditions.id("block/multiblock/heliofusion_exoticizer"))
+            .register()
+
+        HELIOPHASE_LEYLINE_CRYSTALLIZER = REGISTRATE.multiblock("heliophase_leyline_crystallizer",
+            Function { HeliophaseLeylineCrystallizer(it) })
+            .allRotation()
+            .tooltipTextKey(Component.translatable("gtladditions.multiblock.heliophase_leyline_crystallizer.tooltip.0"))
+            .tooltipTextKey(Component.translatable("gtladditions.multiblock.heliophase_leyline_crystallizer.tooltip.1"))
+            .tooltipTextKey(Component.translatable("gtladditions.multiblock.forge_of_the_antichrist.tooltip.8"))
+            .tooltipTextKey(Component.translatable("gtladditions.multiblock.forge_of_the_antichrist_module.tooltip.4"))
+            .tooltipTextKey(Component.translatable("gtladditions.multiblock.forge_of_the_antichrist_module.tooltip.2"))
+            .tooltipTextKey(Component.translatable("gtceu.machine.eut_multiplier.tooltip", 256))
+            .tooltipTextKey(Component.translatable("gtladditions.multiblock.wireless_multiple_recipes_machine.tooltip.0"))
+            .tooltipTextKey(Component.translatable("gtladditions.multiblock.wireless_multiple_recipes_machine.tooltip.1"))
+            .tooltipTextKey(Component.translatable("tooltip.gtlcore.structure.source", "GTNH"))
+            .tooltipTextRecipeTypes(LEYLINE_CRYSTALLIZE)
+            .tooltipBuilder(GTLAddMachines.GTLAdd_ADD)
+            .recipeTypes(LEYLINE_CRYSTALLIZE)
             .appearanceBlock(GOD_FORGE_TRIM_CASING)
             .pattern { definition ->
                 MultiBlockStructureD.FORGE_OF_THE_ANTICHRIST_MODULE!!

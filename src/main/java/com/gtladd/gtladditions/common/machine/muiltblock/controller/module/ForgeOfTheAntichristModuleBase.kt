@@ -5,6 +5,7 @@ import com.gregtechceu.gtceu.api.capability.recipe.RecipeCapability
 import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity
 import com.gregtechceu.gtceu.api.machine.feature.IRecipeLogicMachine
 import com.gregtechceu.gtceu.api.recipe.GTRecipe
+import com.gregtechceu.gtceu.api.recipe.GTRecipeType
 import com.gregtechceu.gtceu.api.recipe.content.Content
 import com.gregtechceu.gtceu.api.recipe.content.ContentModifier
 import com.gregtechceu.gtceu.utils.FormattingUtil
@@ -12,6 +13,7 @@ import com.gtladd.gtladditions.api.machine.logic.GTLAddMultipleWirelessRecipesLo
 import com.gtladd.gtladditions.api.machine.wireless.GTLAddWirelessWorkableElectricMultipleRecipesMachine
 import com.gtladd.gtladditions.common.data.ParallelData
 import com.gtladd.gtladditions.common.machine.muiltblock.controller.ForgeOfTheAntichrist
+import com.gtladd.gtladditions.utils.CommonUtils.createLanguageRainbowComponentOnServer
 import com.gtladd.gtladditions.utils.CommonUtils.createRainbowComponent
 import com.gtladd.gtladditions.utils.RecipeCalculationHelper
 import com.gtladd.gtladditions.utils.antichrist.AntichristPosHelper
@@ -24,9 +26,10 @@ import net.minecraft.core.BlockPos
 import net.minecraft.network.chat.Component
 import org.gtlcore.gtlcore.api.machine.multiblock.IModularMachineModule
 import org.gtlcore.gtlcore.api.recipe.IGTRecipe
+import org.gtlcore.gtlcore.api.recipe.RecipeResult
 import org.gtlcore.gtlcore.api.recipe.RecipeRunnerHelper
 
-open class ForgeOfTheAntichristModuleBase(holder: IMachineBlockEntity, vararg args: Any?) :
+abstract class ForgeOfTheAntichristModuleBase(holder: IMachineBlockEntity, vararg args: Any?) :
     GTLAddWirelessWorkableElectricMultipleRecipesMachine(
         holder,
         *args
@@ -71,15 +74,19 @@ open class ForgeOfTheAntichristModuleBase(holder: IMachineBlockEntity, vararg ar
         removeFromHost(this.host)
     }
 
+    abstract override fun createRecipeLogic(vararg args: Any): ForgeOfTheAntichristModuleBaseLogic
+
+    abstract override fun getRecipeLogic(): ForgeOfTheAntichristModuleBaseLogic
+
     override fun addDisplayText(textList: MutableList<Component?>) {
         super.addDisplayText(textList)
         if (!this.isFormed) return
 
-        if (isConnectedToHost) {
+        if (isConnectedToHost && getRecipeLogic().enableModify(this.recipeType)) {
             textList.add(
                 if (host!!.runningSecs >= ForgeOfTheAntichrist.MAX_EFFICIENCY_SEC) {
-                    createRainbowComponent(
-                        Component.translatable("gtladditions.multiblock.forge_of_the_antichrist.achieve_max_efficiency").string
+                    createLanguageRainbowComponentOnServer(
+                        Component.translatable("gtladditions.multiblock.forge_of_the_antichrist.achieve_max_efficiency")
                     )
                 } else {
                     Component.translatable(
@@ -101,16 +108,16 @@ open class ForgeOfTheAntichristModuleBase(holder: IMachineBlockEntity, vararg ar
         textList.add(
             Component.translatable(
                 "gtceu.multiblock.parallel",
-                createRainbowComponent(
-                    Component.translatable("gtladditions.multiblock.forge_of_the_antichrist.parallel").string
+                createLanguageRainbowComponentOnServer(
+                    Component.translatable("gtladditions.multiblock.forge_of_the_antichrist.parallel")
                 )
             ).withStyle(ChatFormatting.GRAY)
         )
         textList.add(
             Component.translatable(
                 "gtladditions.multiblock.threads",
-                createRainbowComponent(
-                    Component.translatable("gtladditions.multiblock.forge_of_the_antichrist.parallel").string
+                createLanguageRainbowComponentOnServer(
+                    Component.translatable("gtladditions.multiblock.forge_of_the_antichrist.parallel")
                 )
             ).withStyle(ChatFormatting.GRAY)
         )
@@ -126,8 +133,13 @@ open class ForgeOfTheAntichristModuleBase(holder: IMachineBlockEntity, vararg ar
             GTLAddWirelessWorkableElectricMultipleRecipesMachine.Companion.MANAGED_FIELD_HOLDER
         )
 
+        val FAIL_HOST_NOT_WORKING: RecipeResult = RecipeResult.fail(
+            Component.translatable("gtladditions.recipe.fail.host_not_working")
+        )
+
         val BEFORE_WORKING = Predicate { machine: IRecipeLogicMachine ->
-            (machine as ForgeOfTheAntichristModuleBase).host?.let { it -> return@let it.isActive } ?: false
+            ((machine as ForgeOfTheAntichristModuleBase).host?.let { it -> return@let it.isActive } ?: false)
+                .also { if (!it) RecipeResult.of(machine, FAIL_HOST_NOT_WORKING) }
         }
 
         fun copyAndModifyRecipe(recipe: GTRecipe, modifier: ContentModifier): GTRecipe {
@@ -171,8 +183,9 @@ open class ForgeOfTheAntichristModuleBase(holder: IMachineBlockEntity, vararg ar
         }
 
         open class ForgeOfTheAntichristModuleBaseLogic(
-            parallel: ForgeOfTheAntichristModuleBase
-        ) : GTLAddMultipleWirelessRecipesLogic(parallel, BEFORE_WORKING) {
+            parallel: ForgeOfTheAntichristModuleBase,
+            beforeWorking: Predicate<IRecipeLogicMachine>
+        ) : GTLAddMultipleWirelessRecipesLogic(parallel, beforeWorking) {
             override fun getMachine(): ForgeOfTheAntichristModuleBase = machine as ForgeOfTheAntichristModuleBase
             override fun getEuMultiplier(): Double =
                 getMachine().host?.let { ForgeOfTheAntichrist.Companion.getEuReduction(it) * super.getEuMultiplier() }
@@ -187,7 +200,7 @@ open class ForgeOfTheAntichristModuleBase(holder: IMachineBlockEntity, vararg ar
                     getParallelLimitForRecipe = { Long.MAX_VALUE },
                     getMaxParallelForRecipe = ::getMaxParallel,
                     modifyRecipe = { recipe ->
-                        if (enableModify(recipe)) copyAndModifyRecipe(recipe, modifier) else recipe
+                        if (enableModify(recipe.recipeType)) copyAndModifyRecipe(recipe, modifier) else recipe
                     }
                 )
             }
@@ -196,7 +209,7 @@ open class ForgeOfTheAntichristModuleBase(holder: IMachineBlockEntity, vararg ar
                 return RecipeRunnerHelper.matchRecipe(machine, recipe)
             }
 
-            open fun enableModify(recipe: GTRecipe): Boolean {
+            open fun enableModify(recipeType: GTRecipeType): Boolean {
                 return false
             }
         }

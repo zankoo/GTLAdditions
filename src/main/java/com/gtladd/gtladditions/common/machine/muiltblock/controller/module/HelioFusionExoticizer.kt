@@ -1,11 +1,11 @@
 ﻿package com.gtladd.gtladditions.common.machine.muiltblock.controller.module
 
 import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity
-import com.gregtechceu.gtceu.api.machine.trait.RecipeLogic
 import com.gregtechceu.gtceu.api.recipe.GTRecipe
+import com.gregtechceu.gtceu.api.recipe.GTRecipeType
 import com.gregtechceu.gtceu.api.recipe.content.ContentModifier
 import com.gtladd.gtladditions.common.data.ParallelData
-import com.gtladd.gtladditions.utils.CommonUtils.createRainbowComponent
+import com.gtladd.gtladditions.utils.CommonUtils.createLanguageRainbowComponentOnServer
 import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
 
@@ -15,16 +15,16 @@ class HelioFusionExoticizer(holder: IMachineBlockEntity, vararg args: Any?) :
         *args
     ) {
 
-    override fun createRecipeLogic(vararg args: Any): RecipeLogic = HelioFusionExoticizerLogic(this)
+    override fun createRecipeLogic(vararg args: Any): HelioFusionExoticizerLogic = HelioFusionExoticizerLogic(this)
 
-    override fun getRecipeLogic(): HelioFusionExoticizerLogic = super.getRecipeLogic() as HelioFusionExoticizerLogic
+    override fun getRecipeLogic(): HelioFusionExoticizerLogic = recipeLogic as HelioFusionExoticizerLogic
 
     override fun addParallelDisplay(textList: MutableList<Component?>) {
         textList.add(
             Component.translatable(
                 "gtceu.multiblock.parallel",
-                createRainbowComponent(
-                    Component.translatable("gtladditions.multiblock.forge_of_the_antichrist.parallel").string
+                createLanguageRainbowComponentOnServer(
+                    Component.translatable("gtladditions.multiblock.forge_of_the_antichrist.parallel")
                 )
             ).withStyle(ChatFormatting.GRAY)
         )
@@ -33,7 +33,7 @@ class HelioFusionExoticizer(holder: IMachineBlockEntity, vararg args: Any?) :
     companion object {
         class HelioFusionExoticizerLogic(
             parallel: HelioFusionExoticizer
-        ) : ForgeOfTheAntichristModuleBase.Companion.ForgeOfTheAntichristModuleBaseLogic(parallel) {
+        ) : ForgeOfTheAntichristModuleBase.Companion.ForgeOfTheAntichristModuleBaseLogic(parallel, BEFORE_WORKING) {
             init {
                 this.setReduction(0.5, 1.0)
             }
@@ -74,6 +74,8 @@ class HelioFusionExoticizer(holder: IMachineBlockEntity, vararg args: Any?) :
                     }
                     ?.let { setOf(it) } ?: setOf()
             }
+
+            override fun enableModify(recipeType: GTRecipeType): Boolean = true
         }
     }
 }

@@ -9,7 +9,7 @@ import com.gtladd.gtladditions.common.machine.muiltblock.MultiBlockMachine.NEXUS
 import com.gtladd.gtladditions.common.machine.muiltblock.MultiBlockMachine.NEXUS_SATELLITE_FACTORY_MKII
 import com.gtladd.gtladditions.common.machine.muiltblock.MultiBlockMachine.NEXUS_SATELLITE_FACTORY_MKIII
 import com.gtladd.gtladditions.common.machine.muiltblock.MultiBlockMachine.NEXUS_SATELLITE_FACTORY_MKIV
-import com.gtladd.gtladditions.utils.CommonUtils.createRainbowComponent
+import com.gtladd.gtladditions.utils.CommonUtils.createLanguageRainbowComponentOnServer
 import com.gtladd.gtladditions.utils.LightHunterSpaceStationPosHelper
 import com.lowdragmc.lowdraglib.syncdata.annotation.DescSynced
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted
@@ -52,11 +52,11 @@ class LightHunterSpaceStation(holder: IMachineBlockEntity, vararg args: Any?) :
         super.addDisplayText(textList)
         if (!isFormed) return
         textList.add(
-            if (unlockParadoxical()) createRainbowComponent(
-                Component.translatable("tooltip.gtladditions.industrial_array_max").string
+            if (unlockParadoxical()) createLanguageRainbowComponentOnServer(
+                Component.translatable("tooltip.gtladditions.industrial_array_max")
             ) else Component.translatable(
                 "tooltip.gtladditions.astral_array_count",
-                Component.literal("$astralArrayCount / 64").withStyle(ChatFormatting.GOLD)
+                Component.literal("$astralArrayCount / $MAX_ASTRAL_ARRAY_COUNT").withStyle(ChatFormatting.GOLD)
             )
         )
         textList.add(Component.translatable("tooltip.gtlcore.installed_module_count", getMAM()))

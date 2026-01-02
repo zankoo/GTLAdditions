@@ -154,7 +154,7 @@ open class MutableRecipesLogic<T> : RecipeLogic, ILockRecipe, IWirelessRecipeLog
         )
     }
 
-    private fun buildFinalNormalRecipe(parallelData: ParallelData): GTRecipe? {
+    protected open fun buildFinalNormalRecipe(parallelData: ParallelData): GTRecipe? {
         val maxEUt = getMachine().overclockVoltage
         val (itemOutputs, fluidOutputs, totalEu) = RecipeCalculationHelper.processParallelDataNormal(
             parallelData, machine, maxEUt, euMultiplier, { getRecipeEut(it).toDouble() * it.duration }
@@ -168,7 +168,7 @@ open class MutableRecipesLogic<T> : RecipeLogic, ILockRecipe, IWirelessRecipeLog
         return RecipeCalculationHelper.buildNormalRecipe(itemOutputs, fluidOutputs, totalEu, maxEUt, 20)
     }
 
-    private fun buildFinalWirelessRecipe(
+    protected open fun buildFinalWirelessRecipe(
         parallelData: ParallelData,
         wirelessTrait: IWirelessNetworkEnergyHandler
     ): WirelessGTRecipe? {

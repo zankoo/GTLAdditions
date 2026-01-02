@@ -18,6 +18,7 @@ import com.gtladd.gtladditions.common.items.GTLAddItems
 import com.gtladd.gtladditions.common.items.GTLAddItems.ASTRAL_ARRAY
 import com.gtladd.gtladditions.common.items.GTLAddItems.BLACK_HOLE_SEED
 import com.gtladd.gtladditions.common.items.GTLAddItems.RELATIVISTIC_HEAT_CAPACITOR
+import com.gtladd.gtladditions.common.items.GTLAddItems.SUPER_DENSE_MAGMATTER_PLATE
 import com.gtladd.gtladditions.common.machine.GTLAddMachines
 import com.gtladd.gtladditions.common.machine.GTLAddMachines.SUPER_PARALLEL_HATCH
 import com.gtladd.gtladditions.common.machine.GTLAddMachines.THREAD_MODIFIER_HATCH
@@ -786,6 +787,33 @@ object NewMultiBlockMachineController {
             .EUt(VA[MAX].toLong()).duration(2304000)
             .stationResearch { b : StationRecipeBuilder? ->
                 b !!.researchStack(SUPER_PARTICLE_COLLIDER.asStack())
+                    .dataStack(TOOL_DATA_MODULE.asStack())
+                    .EUt(VA[MAX]).CWUt(67108864, 2147483647)
+            }
+            .save(provider)
+        SUPRACHRONAL_ASSEMBLY_LINE_RECIPES.recipeBuilder(id("heliophase_leyline_crystallizer"))
+            .inputItems(GTLAddBlocks.GOD_FORGE_TRIM_CASING, 4096)
+            .inputItems(MultiBlockMachine.DRACONIC_COLLAPSE_CORE, 4096)
+            .inputItems(DOOR_OF_CREATE, 4096)
+            .inputItems(getItemStack("kubejs:chaotic_energy_core", 4096))
+            .inputItems(SUPER_DENSE_MAGMATTER_PLATE, 64)
+            .inputItems(SUPER_DENSE_MAGMATTER_PLATE, 64)
+            .inputItems(SUPER_DENSE_MAGMATTER_PLATE, 64)
+            .inputItems(SUPER_DENSE_MAGMATTER_PLATE, 64)
+            .inputItems(PHONON_CONDUIT, 256)
+            .inputItems(GTLAddBlocks.GOD_FORGE_ENERGY_CASING, 64)
+            .inputItems(plateDense,Cosmic, 4096)
+            .inputItems(plateDense,Eternity, 4096)
+            .inputItems(plateDense,Infinity, 4096)
+            .inputItems(ASTRAL_ARRAY, 1024)
+            .inputFluids(MagnetohydrodynamicallyConstrainedStarMatter.getFluid(14745600000))
+            .inputFluids(Chaos.getFluid(20480000000))
+            .inputFluids(PHONON_MEDIUM.getFluid(6400000000))
+            .inputFluids(TranscendentMetal.getFluid(14745600000))
+            .outputItems(MultiBlockMachine.HELIOPHASE_LEYLINE_CRYSTALLIZER)
+            .EUt(VA[MAX].toLong()).duration(2304000)
+            .stationResearch { b : StationRecipeBuilder? ->
+                b !!.researchStack(MultiBlockMachine.DRACONIC_COLLAPSE_CORE.asStack())
                     .dataStack(TOOL_DATA_MODULE.asStack())
                     .EUt(VA[MAX]).CWUt(67108864, 2147483647)
             }

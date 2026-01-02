@@ -39,11 +39,14 @@ object GTLAddRecipesTypes {
     @JvmField
     val MOLECULAR_DECONSTRUCTION: GTRecipeType
     val UNIVERSE_SANDBOX: GTRecipeType
+    @JvmField
     val CHAOS_WEAVE: GTRecipeType
     @JvmField
     val GENESIS_ENGINE: GTRecipeType
     val STAR_CORE_STRIPPER: GTRecipeType
     val MATTER_EXOTIC: GTRecipeType
+    val LEYLINE_CRYSTALLIZE: GTRecipeType
+    @JvmField
     val INTER_STELLAR: GTRecipeType
     val NIGHTMARE_CRAFTING: GTRecipeType
     val SPACE_ORE_PROCESSOR: GTRecipeType
@@ -174,6 +177,10 @@ object GTLAddRecipesTypes {
             .setMaxTooltips(1)
             .setProgressBar(GuiTextures.PROGRESS_BAR_ARROW, FillDirection.LEFT_TO_RIGHT)
             .setSound(GTLSoundEntries.FUSIONLOOP)
+        LEYLINE_CRYSTALLIZE = GTRecipeTypes.register("leyline_crystallize", GTRecipeTypes.MULTIBLOCK)
+            .setEUIO(IO.IN).setMaxIOSize(9, 1, 0, 0)
+            .setProgressBar(GuiTextures.PROGRESS_BAR_ARROW, FillDirection.LEFT_TO_RIGHT)
+            .setSound(GTSoundEntries.ARC)
         INTER_STELLAR = GTRecipeTypes.register("inter_stellar", GTRecipeTypes.MULTIBLOCK)
             .setEUIO(IO.IN).setMaxIOSize(1, 0, 0, 0)
             .setMaxTooltips(1)

@@ -56,7 +56,7 @@ class MacroAtomicResonantFragmentStripper(holder: IMachineBlockEntity) :
             textList.add(
                 Component.translatable(
                     "tooltip.gtladditions.astral_array_count",
-                    Component.literal(astralArrayCount.toString()).withStyle(ChatFormatting.GOLD)
+                    Component.literal("$astralArrayCount / $MAX_ASTRAL_ARRAY_COUNT").withStyle(ChatFormatting.GOLD)
                 )
             )
         }
@@ -93,7 +93,7 @@ class MacroAtomicResonantFragmentStripper(holder: IMachineBlockEntity) :
         const val MAX_ASTRAL_ARRAY_COUNT = 256
 
         val FAIL_NO_ASTRAL_ARRAY: RecipeResult = RecipeResult.fail(
-            Component.translatable("gtladditions.recipe.fail.no.astral.array")
+            Component.translatable("gtladditions.recipe.fail.no_astral_array")
         )
 
         val FRAGMENT_STRIPPER = Predicate { machine: IRecipeLogicMachine ->

@@ -45,6 +45,7 @@ class GTLAdditionsGTAddon : IGTAddon {
         NightmareCrafting.init(provider)
         GenesisEngine.init(provider)
         HeliofusionExoticizer.init(provider)
+        LeylineCrystallize.init(provider)
         InterStellar.init(provider)
         AE2.init(provider)
         Assembler.init(provider)

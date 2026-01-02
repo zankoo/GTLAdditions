@@ -6,7 +6,7 @@ import com.gregtechceu.gtceu.api.machine.trait.RecipeLogic
 import com.gtladd.gtladditions.api.machine.logic.GTLAddMultipleRecipesLogic
 import com.gtladd.gtladditions.api.machine.multiblock.GTLAddWorkableElectricMultipleRecipesMachine
 import com.gtladd.gtladditions.common.data.ParallelData
-import com.gtladd.gtladditions.utils.CommonUtils.createRainbowComponent
+import com.gtladd.gtladditions.utils.CommonUtils.createLanguageRainbowComponentOnServer
 import com.gtladd.gtladditions.utils.RecipeCalculationHelper
 import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
@@ -34,16 +34,16 @@ class SpaceInfinityIntegratedOreProcessor(holder: IMachineBlockEntity, vararg ar
         textList.add(
             Component.translatable(
                 "gtceu.multiblock.parallel",
-                createRainbowComponent(
-                    Component.translatable("gtladditions.multiblock.forge_of_the_antichrist.parallel").string
+                createLanguageRainbowComponentOnServer(
+                    Component.translatable("gtladditions.multiblock.forge_of_the_antichrist.parallel")
                 )
             ).withStyle(ChatFormatting.GRAY)
         )
         textList.add(
             Component.translatable(
                 "gtladditions.multiblock.threads",
-                createRainbowComponent(
-                    Component.translatable("gtladditions.multiblock.forge_of_the_antichrist.parallel").string
+                createLanguageRainbowComponentOnServer(
+                    Component.translatable("gtladditions.multiblock.forge_of_the_antichrist.parallel")
                 )
             ).withStyle(ChatFormatting.GRAY)
         )

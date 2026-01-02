@@ -20,6 +20,7 @@ import com.gtladd.gtladditions.api.machine.multiblock.GTLAddWorkableElectricMult
 import com.gtladd.gtladditions.common.machine.muiltblock.controller.ForgeOfTheAntichrist;
 import com.gtladd.gtladditions.common.machine.muiltblock.controller.MacroAtomicResonantFragmentStripper;
 import com.gtladd.gtladditions.common.machine.muiltblock.controller.SpaceInfinityIntegratedOreProcessor;
+import com.gtladd.gtladditions.common.machine.muiltblock.controller.TaixuTurbidArray;
 import com.gtladd.gtladditions.common.machine.muiltblock.controller.module.ForgeOfTheAntichristModuleBase;
 import com.gtladd.gtladditions.common.machine.muiltblock.controller.module.HelioFusionExoticizer;
 import com.gtladd.gtladditions.common.machine.muiltblock.controller.module.LightHunterSpaceStationModuleBase;
@@ -112,8 +113,11 @@ public abstract class ParallelProviderMixin {
                         compoundTag.putLong("parallel", ((ParallelMachine) workableElectricMultiblockMachine).getMaxParallel());
                         compoundTag.putLong("threads", Ints.saturatedCast(64L + ((IThreadModifierMachine) workableElectricMultiblockMachine).getAdditionalThread()));
                     } else if (logic instanceof MutableRecipesLogic<?> mutableRecipesLogic) {
-                        compoundTag.putLong("parallel", ((ParallelMachine) workableElectricMultiblockMachine).getMaxParallel());
-                        if (mutableRecipesLogic.getMultipleThreads() > 1) compoundTag.putLong("threads", mutableRecipesLogic.getMultipleThreads());
+                        if (workableElectricMultiblockMachine instanceof TaixuTurbidArray taixu) {
+                            compoundTag.putLong("parallel", taixu.getRealParallel());
+                        } else compoundTag.putLong("parallel", ((ParallelMachine) workableElectricMultiblockMachine).getMaxParallel());
+                        if (mutableRecipesLogic.isMultipleRecipeMode() && mutableRecipesLogic.getMultipleThreads() > 1)
+                            compoundTag.putLong("threads", mutableRecipesLogic.getMultipleThreads());
                     } else if (blockEntity.getMetaMachine() instanceof ParallelMachine controller) {
                         compoundTag.putLong("parallel", controller.getMaxParallel());
                     } else {

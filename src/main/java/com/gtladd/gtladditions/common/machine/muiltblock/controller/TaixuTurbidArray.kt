@@ -1,8 +1,10 @@
 package com.gtladd.gtladditions.common.machine.muiltblock.controller
 
+import com.google.common.primitives.Ints
 import com.gregtechceu.gtceu.api.GTCEuAPI
 import com.gregtechceu.gtceu.api.GTValues
 import com.gregtechceu.gtceu.api.block.ICoilType
+import com.gregtechceu.gtceu.api.capability.recipe.EURecipeCapability
 import com.gregtechceu.gtceu.api.capability.recipe.FluidRecipeCapability
 import com.gregtechceu.gtceu.api.capability.recipe.IO
 import com.gregtechceu.gtceu.api.gui.GuiTextures
@@ -11,44 +13,59 @@ import com.gregtechceu.gtceu.api.machine.MetaMachine
 import com.gregtechceu.gtceu.api.machine.feature.IMachineLife
 import com.gregtechceu.gtceu.api.machine.multiblock.WorkableMultiblockMachine
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableItemStackHandler
+import com.gregtechceu.gtceu.api.machine.trait.RecipeLogic
 import com.gregtechceu.gtceu.api.recipe.GTRecipe
-import com.gregtechceu.gtceu.api.recipe.RecipeHelper
+import com.gregtechceu.gtceu.api.recipe.content.Content
 import com.gregtechceu.gtceu.api.recipe.content.ContentModifier
 import com.gregtechceu.gtceu.common.block.CoilBlock
 import com.gregtechceu.gtceu.common.data.GTMaterials
 import com.gregtechceu.gtceu.common.data.GTRecipeTypes
 import com.gregtechceu.gtceu.data.recipe.builder.GTRecipeBuilder
 import com.gtladd.gtladditions.GTLAdditions
+import com.gtladd.gtladditions.api.machine.IAstralArrayInteractionMachine
+import com.gtladd.gtladditions.api.machine.logic.AddMutableRecipesLogic
+import com.gtladd.gtladditions.api.machine.trait.IWirelessNetworkEnergyHandler
+import com.gtladd.gtladditions.api.recipe.WirelessGTRecipe
+import com.gtladd.gtladditions.common.data.ParallelData
 import com.gtladd.gtladditions.common.items.GTLAddItems
+import com.gtladd.gtladditions.common.machine.muiltblock.controller.mutable.MutableTierCasingMachine
+import com.gtladd.gtladditions.utils.RecipeCalculationHelper
 import com.lowdragmc.lowdraglib.gui.widget.SlotWidget
 import com.lowdragmc.lowdraglib.gui.widget.Widget
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup
 import com.lowdragmc.lowdraglib.misc.ItemStackTransfer
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder
-import it.unimi.dsi.fastutil.ints.IntArrayList
+import it.unimi.dsi.fastutil.longs.LongBooleanPair
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet
+import net.minecraft.ChatFormatting
 import net.minecraft.MethodsReturnNonnullByDefault
 import net.minecraft.network.chat.Component
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
-import net.minecraftforge.common.util.Lazy
 import org.gtlcore.gtlcore.api.pattern.util.IValueContainer
 import org.gtlcore.gtlcore.api.recipe.IParallelLogic
+import org.gtlcore.gtlcore.api.recipe.RecipeResult
 import org.gtlcore.gtlcore.common.data.GTLMaterials
-import org.gtlcore.gtlcore.common.machine.multiblock.electric.TierCasingMachine
+import org.gtlcore.gtlcore.utils.NumberUtils
 import org.gtlcore.gtlcore.utils.Registries
+import java.math.BigInteger
 import java.text.DecimalFormat
+import java.util.*
 import java.util.concurrent.ThreadLocalRandom
 import javax.annotation.ParametersAreNonnullByDefault
 import kotlin.math.*
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-open class TaixuTurbidArray(holder: IMachineBlockEntity) : TierCasingMachine(holder, "SCTier"), IMachineLife {
+open class TaixuTurbidArray(holder: IMachineBlockEntity) : MutableTierCasingMachine(holder, "SCTier"), IMachineLife, IAstralArrayInteractionMachine {
 
     @field:Persisted
     val machineStorage: NotifiableItemStackHandler
+
+    @field:Persisted
+    override var astralArrayCount: Int = 0
 
     private var coilType: ICoilType = CoilBlock.CoilType.CUPRONICKEL
     private var height: Int = 0
@@ -71,6 +88,24 @@ open class TaixuTurbidArray(holder: IMachineBlockEntity) : TierCasingMachine(hol
     private fun filter(itemStack: ItemStack): Boolean {
         return VALID_ITEMS.contains(itemStack.item)
     }
+
+    override fun increaseAstralArrayCount(amount: Int): Int {
+        val actualIncrease = minOf(amount, MAX_ASTRAL_ARRAY_COUNT - astralArrayCount)
+        if (actualIncrease > 0) {
+            if (astralArrayCount == 0) getRecipeLogic().setUseMultipleRecipes(true)
+            astralArrayCount += actualIncrease
+            recalculateAstralParallel()
+        }
+        return actualIncrease
+    }
+
+    override fun createRecipeLogic(vararg args: Any): RecipeLogic {
+        return TaixuTurbidArrayLogic(this)
+    }
+
+    override fun getMaxParallel(): Int = Ints.saturatedCast(maxParallel)
+
+    fun getRealParallel(): Long = maxParallel
 
     // ==================== Life Cycle ====================
     private fun createMachineStorage(): NotifiableItemStackHandler {
@@ -104,6 +139,8 @@ open class TaixuTurbidArray(holder: IMachineBlockEntity) : TierCasingMachine(hol
         }
 
         recalculateAll()
+
+        if (astralArrayCount > 0) getRecipeLogic().setUseMultipleRecipes(true)
     }
 
     // ==================== GUI ====================
@@ -150,6 +187,13 @@ open class TaixuTurbidArray(holder: IMachineBlockEntity) : TierCasingMachine(hol
                     textList.add(Component.translatable("gtceu.machine.taixu.gui.tooltip.5", uuMatterAmount))
                 }
             }
+
+            textList.add(
+                Component.translatable(
+                    "tooltip.gtladditions.astral_array_count",
+                    Component.literal("$astralArrayCount / $MAX_ASTRAL_ARRAY_COUNT").withStyle(ChatFormatting.GOLD)
+                )
+            )
         }
     }
 
@@ -161,6 +205,7 @@ open class TaixuTurbidArray(holder: IMachineBlockEntity) : TierCasingMachine(hol
         uuAmplifierAmount = calculateBaseOutputFluid1()
         uuMatterAmount = calculateBaseOutputFluid2()
         recalculateItemCache()
+        recalculateAstralParallel()
     }
 
     private fun recalculateItemCache() {
@@ -176,10 +221,8 @@ open class TaixuTurbidArray(holder: IMachineBlockEntity) : TierCasingMachine(hol
             else -> 0.0
         }
 
-        maxParallel = if (isAstralArray) {
-            ASTRAL_BASE_PARALLEL * itemStack.count.toDouble().pow(5.0/3.0).toInt()
-        } else {
-            (PARALLEL_BASE * PARALLEL_POWER_BASE.pow(coilType.coilTemperature / PARALLEL_TEMP_DIVISOR)).toLong()
+        if (astralArrayCount <= 0) {
+            maxParallel = (PARALLEL_BASE * PARALLEL_POWER_BASE.pow(coilType.coilTemperature / PARALLEL_TEMP_DIVISOR)).roundToLong()
         }
 
         successRateA = if (isAstralArray) {
@@ -199,13 +242,18 @@ open class TaixuTurbidArray(holder: IMachineBlockEntity) : TierCasingMachine(hol
         }
     }
 
+    private fun recalculateAstralParallel() {
+        if (astralArrayCount <= 0) return
+        maxParallel = ASTRAL_BASE_PARALLEL * astralArrayCount.toDouble().pow(5.0/3.0).roundToLong()
+    }
+
     private fun calculateFrameA(): Double {
         return FRAME_A_BASE * (FRAME_A_TIER_POWER.pow(casingTier.toDouble()) - 1) *
                sqrt((GTValues.ALL_TIERS[tier] + 1).toDouble())
     }
 
     private fun calculateFrameB(): Double {
-        val coilIndex = coil.get().indexOf(coilType.coilTemperature) + 1
+        val coilIndex = coil.value.indexOf(coilType.coilTemperature) + 1
         return FRAME_B_BASE * FRAME_B_POWER_BASE.pow(coilIndex.toDouble()) *
                (coilType.coilTemperature / FRAME_B_TEMP_DIVISOR).pow(FRAME_B_TEMP_POWER)
     }
@@ -269,20 +317,19 @@ open class TaixuTurbidArray(holder: IMachineBlockEntity) : TierCasingMachine(hol
         private const val RECIPE_DURATION = 100
         private const val RECIPE_EU_MULTIPLIER = 524288L
 
-        private val coil: Lazy<IntArrayList> = Lazy.of {
-            IntArrayList(
-                GTCEuAPI.HEATING_COILS.keys.stream()
-                    .map { it.coilTemperature }
-                    .sorted()
-                    .toList()
-            )
-        }
+        private val coil: Lazy<Array<Int>> = lazyOf(
+            GTCEuAPI.HEATING_COILS.keys
+                .map { it.coilTemperature }
+                .sorted()
+                .toTypedArray()
+        )
 
         private val ENDERIUM_ITEM: ItemStack = Registries.getItemStack("gtceu:enderium_nanoswarm", 64)
         private val DRACONIUM_ITEM: ItemStack = Registries.getItemStack("gtceu:draconium_nanoswarm", 64)
         private val SPACETIME_ITEM: ItemStack = Registries.getItemStack("gtceu:spacetime_nanoswarm", 64)
         private val ETERNITY_ITEM: ItemStack = Registries.getItemStack("gtceu:eternity_nanoswarm", 64)
         private val ASTRAL_ARRAY_ITEM: ItemStack = GTLAddItems.ASTRAL_ARRAY.asStack()
+        private const val MAX_ASTRAL_ARRAY_COUNT = 2048
 
         private val VALID_ITEMS: Set<Item> = setOf(
             ENDERIUM_ITEM.item,
@@ -296,9 +343,14 @@ open class TaixuTurbidArray(holder: IMachineBlockEntity) : TierCasingMachine(hol
         fun recipeModifier(machine: MetaMachine, recipe: GTRecipe): GTRecipe? {
             if (machine !is TaixuTurbidArray) return null
 
-            var modifiedRecipe = recipe.copy()
             val maxParallel = IParallelLogic.getMaxParallel(machine, recipe, machine.maxParallel)
             if (maxParallel <= 0) return null
+
+            return parallelWithFixedEutModifier(machine, outputWithoutEutModifier(machine, recipe), maxParallel)
+        }
+
+        private fun outputWithoutEutModifier(machine: TaixuTurbidArray, recipe: GTRecipe): GTRecipe {
+            val modifiedRecipe = recipe.copy()
 
             // Build fluid outputs based on success rates
             val builder = GTRecipeBuilder(GTLAdditions.id("uu"), GTRecipeTypes.DUMMY_RECIPES)
@@ -326,16 +378,113 @@ open class TaixuTurbidArray(holder: IMachineBlockEntity) : TierCasingMachine(hol
                 modifiedRecipe.outputs[FluidRecipeCapability.CAP]!!.addAll(generatedOutputs)
             }
 
+            // For fixed RecipeEut
+            modifiedRecipe.tickInputs.clear()
+
+            return modifiedRecipe
+        }
+
+        private fun parallelWithFixedEutModifier(machine: TaixuTurbidArray, modifiedRecipe: GTRecipe, maxParallel: Long): GTRecipe? {
             // Apply parallel limit based on output merging
             val minParallel = IParallelLogic.getMinParallel(machine, modifiedRecipe, maxParallel)
             if (minParallel <= 0) return null
 
-            // Apply parallel multiplier
-            modifiedRecipe = modifiedRecipe.copy(ContentModifier.multiplier(minParallel.toDouble()), false)
-            modifiedRecipe.duration = RECIPE_DURATION
-            RecipeHelper.setInputEUt(modifiedRecipe, RECIPE_EU_MULTIPLIER * GTValues.V[machine.tier])
+            // Apply parallel multiplier, duration and eut
+            val parallelRecipe = modifiedRecipe.copy(ContentModifier.multiplier(minParallel.toDouble()), false)
+            parallelRecipe.duration = RECIPE_DURATION
+            parallelRecipe.tickInputs[EURecipeCapability.CAP] =
+                listOf(Content(RECIPE_EU_MULTIPLIER * GTValues.V[machine.tier], 10000, 10000, 0, null, null))
 
-            return modifiedRecipe
+            return parallelRecipe
+        }
+
+        class TaixuTurbidArrayLogic(machine: TaixuTurbidArray) : AddMutableRecipesLogic<TaixuTurbidArray>(machine) {
+
+
+            override fun lookupRecipeSet(): Set<GTRecipe> {
+                val taixu = getMachine()
+                return if (isLock) {
+                    when {
+                        lockRecipe == null -> {
+                            lockRecipe = machine.recipeType.lookup.find(machine, this::checkRecipe)
+                            lockRecipe?.let { Collections.singleton(outputWithoutEutModifier(taixu, it)) } ?: emptySet()
+                        }
+                        checkRecipe(lockRecipe) -> Collections.singleton(outputWithoutEutModifier(taixu, lockRecipe))
+                        else -> emptySet()
+                    }
+                } else {
+                    machine.recipeType.lookup
+                        .getRecipeIterator(machine, this::checkRecipe)
+                        .asSequence()
+                        .map { outputWithoutEutModifier(taixu, it) }
+                        .toCollection(ObjectOpenHashSet())
+                }
+            }
+
+            override fun calculateParallels(): ParallelData? {
+                val recipes = lookupRecipeSet()
+                val totalParallel = NumberUtils.saturatedMultiply(getMachine().maxParallel, getMultipleThreads().toLong())
+
+                return RecipeCalculationHelper.calculateParallelsWithFairAllocation(
+                    recipes,
+                    totalParallel
+                ) { recipe ->
+                    LongBooleanPair.of(calculateParallel(machine, recipe, totalParallel).firstLong(), true)
+                }
+            }
+
+            override fun buildFinalNormalRecipe(parallelData: ParallelData): GTRecipe? {
+                val maxEUt = getMachine().overclockVoltage
+                val (itemOutputs, fluidOutputs) = RecipeCalculationHelper.processParallelDataNormal(
+                    parallelData, machine, maxEUt, euMultiplier, { getRecipeEut(it).toDouble() * it.duration }
+                )
+
+                if (!RecipeCalculationHelper.hasOutputs(itemOutputs, fluidOutputs)) {
+                    if (recipeStatus == null || recipeStatus.isSuccess) RecipeResult.of(
+                        this.machine,
+                        RecipeResult.FAIL_FIND
+                    )
+                    return null
+                }
+
+                val totalEu = RECIPE_EU_MULTIPLIER * GTValues.V[getMachine().tier].toDouble() * RECIPE_DURATION
+                return RecipeCalculationHelper.buildNormalRecipe(
+                    itemOutputs,
+                    fluidOutputs,
+                    if (isMultipleRecipeMode()) totalEu * 16 else totalEu,
+                    maxEUt,
+                    20
+                )
+            }
+
+            override fun buildFinalWirelessRecipe(
+                parallelData: ParallelData,
+                wirelessTrait: IWirelessNetworkEnergyHandler
+            ): WirelessGTRecipe? {
+                if (!wirelessTrait.isOnline) return null
+
+                val (itemOutputs, fluidOutputs) = RecipeCalculationHelper.processParallelDataWireless(
+                    parallelData, machine, wirelessTrait.maxAvailableEnergy, euMultiplier, this::getRecipeEut
+                )
+
+                if (!RecipeCalculationHelper.hasOutputs(itemOutputs, fluidOutputs)) {
+                    if (recipeStatus == null || recipeStatus.isSuccess) RecipeResult.of(
+                        this.machine,
+                        RecipeResult.FAIL_FIND
+                    )
+                    return null
+                }
+
+                val totalEu = RECIPE_EU_MULTIPLIER * GTValues.V[getMachine().tier] * RECIPE_DURATION
+                return RecipeCalculationHelper.buildWirelessRecipe(
+                    itemOutputs,
+                    fluidOutputs,
+                    20,
+                    if (isMultipleRecipeMode()) BigInteger.valueOf(totalEu * 16) else BigInteger.valueOf(totalEu)
+                )
+            }
+
+            override fun getMultipleThreads(): Int = 128
         }
     }
 }
